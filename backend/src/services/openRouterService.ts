@@ -60,7 +60,8 @@ The JSON schema MUST exactly match:
 }
 
 Ensure the generated questions are realistic, follow academic standards, and matches the requested sections exactly.
-Difficulty tags MUST be strictly either "Easy", "Moderate", or "Challenging".`;
+Difficulty tags MUST be strictly either "Easy", "Moderate", or "Challenging".
+CRITICAL: Do not output raw newlines, carriage returns, or tab characters inside any JSON string values (like "text" or "answerText"). If you need to write multi-line text or equations, format them as single-line strings using escaped '\\n' sequences instead. Ensure all string quotes are properly closed.`;
 
   const userPrompt = `Generate an assessment paper based on the following criteria:
 
@@ -83,7 +84,7 @@ Now generate the structured assessment and return it as the raw JSON described i
       },
       body: JSON.stringify({
         model,
-        max_tokens: 3000,
+        max_tokens: 4000,
         messages: [
           { role: 'system', content: systemPrompt },
           {
