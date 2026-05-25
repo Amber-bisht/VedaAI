@@ -37,7 +37,7 @@ export default function DashboardLayout({
   const navItems = [
     { name: 'Home', icon: Home, href: '/' },
     { name: 'My Groups', icon: Users, href: '#' },
-    { name: 'Assignments', icon: FileText, href: '/', badgeCount: assessments.length || 10 },
+    { name: 'Assignments', icon: FileText, href: '/', badgeCount: assessments.length },
     { name: 'AI Teacher\'s Toolkit', icon: Wand2, href: '#' },
     { name: 'My Library', icon: FolderHeart, href: '#' }
   ];

@@ -48,12 +48,25 @@ export const startAssessmentWorker = () => {
 
         // Step 2: Download and parse file context if uploaded
         let contextText = '';
+        let imageBase64 = '';
+        let mimeType = '';
+
         if (assessment.fileUrl) {
           await job.updateProgress({ progress: 20, message: 'Downloading uploaded reference document...' });
           const fileBuffer = await getFileBuffer(assessment.fileUrl);
 
-          await job.updateProgress({ progress: 40, message: 'Extracting text content from document...' });
-          contextText = await parseTextFromFile(fileBuffer, originalFileName || 'document.txt');
+          const fileName = originalFileName || 'document.txt';
+          const ext = fileName.split('.').pop()?.toLowerCase() || '';
+          const isImage = ['png', 'jpg', 'jpeg', 'gif'].includes(ext);
+
+          if (isImage) {
+            await job.updateProgress({ progress: 40, message: 'Preparing reference image...' });
+            imageBase64 = fileBuffer.toString('base64');
+            mimeType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+          } else {
+            await job.updateProgress({ progress: 40, message: 'Extracting text content from document...' });
+            contextText = await parseTextFromFile(fileBuffer, fileName);
+          }
         }
 
         // Step 3: Run AI Generation
@@ -62,7 +75,9 @@ export const startAssessmentWorker = () => {
           dueDate: assessment.dueDate.toISOString(),
           instructions: assessment.instructions,
           questionTypes: assessment.criteria.questionTypes,
-          contextText: contextText || undefined
+          contextText: contextText || undefined,
+          imageBase64: imageBase64 || undefined,
+          mimeType: mimeType || undefined
         });
 
         // Step 4: Parse & validate output

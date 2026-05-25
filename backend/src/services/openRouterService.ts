@@ -13,11 +13,13 @@ export interface GenerationParams {
     marks: number;
   }>;
   contextText?: string;
+  imageBase64?: string;
+  mimeType?: string;
 }
 
 export const generateAssessmentAI = async (params: GenerationParams): Promise<any> => {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3-70b-instruct:free';
+  const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
 
   if (!apiKey) {
     throw new Error('OPENROUTER_API_KEY is not defined in the environment variables');
@@ -81,9 +83,23 @@ Now generate the structured assessment and return it as the raw JSON described i
       },
       body: JSON.stringify({
         model,
+        max_tokens: 3000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          {
+            role: 'user',
+            content: params.imageBase64
+              ? [
+                  { type: 'text', text: userPrompt },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:${params.mimeType};base64,${params.imageBase64}`
+                    }
+                  }
+                ]
+              : userPrompt
+          }
         ],
         temperature: 0.7,
         response_format: { type: 'json_object' }
