@@ -1,4 +1,5 @@
 import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { s3Client, BUCKET_NAME } from '../config/s3';
 import fs from 'fs';
 import path from 'path';
@@ -103,4 +104,39 @@ export const getFileBuffer = async (fileUrl: string): Promise<Buffer> => {
   }
 
   throw new Error(`Invalid file URL or file not found: ${fileUrl}`);
+};
+
+/**
+ * Generates a presigned URL for a given permanent S3 URL.
+ * Returns the presigned URL with a short expiration (15 minutes).
+ */
+export const getPresignedUrl = async (fileUrl: string | undefined): Promise<string | undefined> => {
+  if (!fileUrl) return undefined;
+
+  // If local fallback file, return as is
+  if (fileUrl.startsWith('/uploads/')) {
+    return fileUrl;
+  }
+
+  // Generate signed URL if S3 is configured and URL is an S3 URL
+  if (isS3Configured() && fileUrl.includes('amazonaws.com')) {
+    try {
+      const urlParts = fileUrl.split('/');
+      const key = urlParts[urlParts.length - 1];
+
+      const command = new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key
+      });
+
+      // Expires in 15 minutes (900 seconds)
+      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 900 });
+      return signedUrl;
+    } catch (error) {
+      console.error('Failed to generate presigned S3 URL:', error);
+      return fileUrl; // Fallback to permanent URL
+    }
+  }
+
+  return fileUrl;
 };

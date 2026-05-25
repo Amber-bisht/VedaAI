@@ -2,10 +2,21 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import Assessment from '../models/Assessment';
 import { assessmentQueue } from '../queues/assessmentQueue';
-import { uploadFile } from '../services/s3Service';
+import { uploadFile, getPresignedUrl } from '../services/s3Service';
 import { generateAssessmentPDF } from '../services/pdfService';
 
 const router = Router();
+
+const signAssessmentUrls = async (assessment: any) => {
+  const obj = assessment.toObject();
+  if (obj.fileUrl) {
+    obj.fileUrl = await getPresignedUrl(obj.fileUrl);
+  }
+  if (obj.pdfUrl) {
+    obj.pdfUrl = await getPresignedUrl(obj.pdfUrl);
+  }
+  return obj;
+};
 
 // Setup Multer to store uploaded files in memory
 const upload = multer({
@@ -69,9 +80,10 @@ router.post('/', upload.single('file'), async (req: Request, res: Response) => {
       originalFileName
     });
 
+    const signedAssessment = await signAssessmentUrls(assessment);
     return res.status(201).json({
       message: 'Assessment creation scheduled successfully.',
-      assessment,
+      assessment: signedAssessment,
       jobId: job.id
     });
   } catch (error: any) {
@@ -87,7 +99,10 @@ router.post('/', upload.single('file'), async (req: Request, res: Response) => {
 router.get('/', async (_req: Request, res: Response) => {
   try {
     const assessments = await Assessment.find().sort({ createdAt: -1 });
-    return res.status(200).json(assessments);
+    const signedAssessments = await Promise.all(
+      assessments.map(async (a) => await signAssessmentUrls(a))
+    );
+    return res.status(200).json(signedAssessments);
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Internal server error.' });
   }
@@ -103,7 +118,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!assessment) {
       return res.status(404).json({ error: 'Assessment not found.' });
     }
-    return res.status(200).json(assessment);
+    const signedAssessment = await signAssessmentUrls(assessment);
+    return res.status(200).json(signedAssessment);
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Internal server error.' });
   }
@@ -141,7 +157,8 @@ router.post('/:id/pdf', async (req: Request, res: Response) => {
     }
 
     const pdfUrl = await generateAssessmentPDF(assessment);
-    return res.status(200).json({ pdfUrl });
+    const presignedPdfUrl = await getPresignedUrl(pdfUrl);
+    return res.status(200).json({ pdfUrl: presignedPdfUrl });
   } catch (error: any) {
     console.error('Error generating PDF:', error);
     return res.status(500).json({ error: error.message || 'Internal server error.' });
@@ -170,9 +187,10 @@ router.post('/:id/regenerate', async (req: Request, res: Response) => {
       assessmentId: assessment._id.toString()
     });
 
+    const signedAssessment = await signAssessmentUrls(assessment);
     return res.status(200).json({
       message: 'Assessment regeneration task scheduled successfully.',
-      assessment,
+      assessment: signedAssessment,
       jobId: job.id
     });
   } catch (error: any) {
