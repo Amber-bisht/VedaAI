@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Lora } from 'next/font/google';
+import { Geist, Geist_Mono, Lora, Outfit, Inter, Bricolage_Grotesque } from 'next/font/google';
 import { ReduxProvider } from '../store/provider';
 import './globals.css';
 
@@ -18,6 +18,21 @@ const lora = Lora({
   subsets: ['latin']
 });
 
+const outfit = Outfit({
+  variable: '--font-outfit',
+  subsets: ['latin']
+});
+
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin']
+});
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  variable: '--font-bricolage-grotesque',
+  subsets: ['latin']
+});
+
 export const metadata: Metadata = {
   title: 'VedaAI - AI Assessment Creator',
   description: 'Generate high-quality structured school assessment papers in real-time with AI'
@@ -31,12 +46,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} h-full antialiased`}
+      className={`${outfit.variable} ${inter.variable} ${geistSans.variable} ${geistMono.variable} ${lora.variable} ${bricolageGrotesque.variable} h-full antialiased`}
     >
       <head>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap"
+          precedence="default"
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
@@ -45,3 +61,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+
