@@ -95,7 +95,7 @@ Now generate the structured assessment and return it as the raw JSON described i
       throw new Error(`OpenRouter API returned error status ${response.status}: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as any;
     const contentText = data.choices?.[0]?.message?.content?.trim();
 
     if (!contentText) {
