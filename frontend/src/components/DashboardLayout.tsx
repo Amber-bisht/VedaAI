@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
+import { setSettings } from '../store/slices/settingsSlice';
 import {
   LayoutGrid,
   Users,
@@ -39,16 +40,41 @@ const SparklesIcon = ({ className = "" }: { className?: string }) => (
 export default function DashboardLayout({
   children,
   title = 'Assignment',
-  showBackButton = false
+  showBackButton = false,
+  workspaceBg = 'bg-[#f5f6f8]',
+  workspacePadding = 'p-6 md:p-8',
+  sidebarButtonText = 'Create Assignment'
 }: {
   children: React.ReactNode;
   title?: string;
   showBackButton?: boolean;
+  workspaceBg?: string;
+  workspacePadding?: string;
+  sidebarButtonText?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const assessments = useSelector((state: RootState) => state.assessmentResult.assessments);
+  const settings = useSelector((state: RootState) => state.settings);
+
+  // Fetch settings from API on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+        const res = await fetch(`${backendUrl}/api/settings`);
+        if (res.ok) {
+          const data = await res.json();
+          dispatch(setSettings(data));
+        }
+      } catch (err) {
+        console.error('Failed to load settings in DashboardLayout:', err);
+      }
+    };
+    fetchSettings();
+  }, [dispatch]);
   
   const navItems = [
     { name: 'Home', icon: LayoutGrid, href: '#' },
@@ -79,7 +105,7 @@ export default function DashboardLayout({
             className="btn-create-assignment cursor-pointer"
           >
             <SparklesIcon className="text-white" />
-            <span>Create Assignment</span>
+            <span>{sidebarButtonText}</span>
           </Link>
         </div>
 
@@ -113,22 +139,22 @@ export default function DashboardLayout({
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-slate-100">
-          <div className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all duration-200 cursor-pointer mb-3">
+          <Link href="/settings" className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all duration-200 cursor-pointer mb-3">
             <Settings className="w-5 h-5 text-slate-400" />
             <span className="text-sm font-semibold text-slate-500">Settings</span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+          <Link href="/settings" className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition-all duration-200 cursor-pointer">
             <img
               src="/image.png"
-              alt="Delhi Public School"
+              alt={settings.schoolName}
               className="w-10 h-10 rounded-full object-cover flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-slate-800 truncate leading-tight">Delhi Public School</p>
-              <p className="text-xs text-slate-400 truncate mt-0.5 font-medium">Bokaro Steel City</p>
+              <p className="text-sm font-bold text-slate-800 truncate leading-tight">{settings.schoolName}</p>
+              <p className="text-xs text-slate-400 truncate mt-0.5 font-medium">{settings.schoolAddress}</p>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 
@@ -158,7 +184,7 @@ export default function DashboardLayout({
                 className="btn-create-assignment cursor-pointer"
               >
                 <SparklesIcon className="text-white" />
-                <span>Create Assignment</span>
+                <span>{sidebarButtonText}</span>
               </Link>
             </div>
 
@@ -191,30 +217,30 @@ export default function DashboardLayout({
             </nav>
 
             <div className="pt-4 border-t border-slate-100">
-              <div className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all duration-200 cursor-pointer mb-3">
+              <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all duration-200 cursor-pointer mb-3">
                 <Settings className="w-5 h-5 text-slate-400" />
                 <span className="text-sm font-semibold text-slate-500">Settings</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+              </Link>
+              <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition-all duration-200 cursor-pointer">
                 <img
                   src="/image.png"
-                  alt="Delhi Public School"
+                  alt={settings.schoolName}
                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-slate-800 truncate leading-tight">Delhi Public School</p>
-                  <p className="text-xs text-slate-400 truncate mt-0.5 font-medium">Bokaro Steel City</p>
+                  <p className="text-sm font-bold text-slate-800 truncate leading-tight">{settings.schoolName}</p>
+                  <p className="text-xs text-slate-400 truncate mt-0.5 font-medium">{settings.schoolAddress}</p>
                 </div>
-              </div>
+              </Link>
             </div>
           </aside>
         </div>
       )}
 
       {/* Main Page Area */}
-      <div className="flex-1 flex flex-col bg-white rounded-none md:rounded-[24px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] border border-slate-100/50 overflow-hidden h-full md:h-full md:max-h-[756px]">
+      <div className="flex-1 flex flex-col gap-4 md:gap-5 h-full md:h-full md:max-h-[756px]">
         {/* Top Header */}
-        <header className="h-16 bg-[#ffffffbf] border-b border-slate-100 flex items-center justify-between px-6 flex-shrink-0 z-10 relative">
+        <header className="h-16 bg-white rounded-none md:rounded-[24px] border border-slate-100/50 flex items-center justify-between px-6 flex-shrink-0 z-10 relative shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)]">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -231,22 +257,32 @@ export default function DashboardLayout({
             </button>
 
             <div className="flex items-center gap-2 pl-2">
-              {/* Very light grey 4-square icon */}
-              <svg 
-                className="w-4 h-4" 
-                style={{ color: '#A9A9A9' }}
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
+              {showBackButton ? (
+                <svg
+                  className="w-4.5 h-4.5"
+                  style={{ color: '#A9A9A9' }}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2Q12 12 2 12Q12 12 12 22Q12 12 22 12Q12 12 12 2Z" />
+                </svg>
+              ) : (
+                <svg 
+                  className="w-4 h-4" 
+                  style={{ color: '#A9A9A9' }}
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+              )}
               <span
                 className="font-bricolage"
                 style={{
@@ -292,7 +328,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content Workspace */}
-        <main className="flex-1 overflow-y-auto bg-[#f5f6f8] p-6 md:p-8 rounded-b-none md:rounded-b-[24px]">
+        <main className={`flex-1 overflow-y-auto ${workspacePadding} rounded-none md:rounded-[24px] border border-slate-100/50 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] ${workspaceBg}`}>
           {children}
         </main>
       </div>

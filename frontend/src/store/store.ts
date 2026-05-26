@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import assessmentFormReducer from './slices/assessmentFormSlice';
 import assessmentResultReducer from './slices/assessmentResultSlice';
+import settingsReducer from './slices/settingsSlice';
 
 export const store = configureStore({
   reducer: {
     assessmentForm: assessmentFormReducer,
-    assessmentResult: assessmentResultReducer
+    assessmentResult: assessmentResultReducer,
+    settings: settingsReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { QueueEvents } from 'bullmq';
 
 import assessmentRoutes from './routes/assessmentRoutes';
+import settingsRoutes from './routes/settingsRoutes';
 import { redisConnection } from './queues/assessmentQueue';
 import { startAssessmentWorker } from './workers/assessmentWorker';
 
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(uploadsPath));
 
 // API Routes
 app.use('/api/assessments', assessmentRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Socket.io initialization
 const io = new Server(server, {

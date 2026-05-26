@@ -270,11 +270,17 @@ export default function CreateAssignment() {
   };
 
   return (
-    <DashboardLayout title="Create Assignment" showBackButton={true}>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Assignment</h1>
-          <p className="text-sm text-slate-500 font-medium">Set up a new assignment for your students</p>
+    <DashboardLayout title="Assignment" showBackButton={true}>
+      <div className="w-full space-y-6">
+        <div className="flex items-start gap-3.5">
+          {/* Green Status Indicator Dot */}
+          <div className="w-[22px] h-[22px] rounded-full bg-[#34c759]/25 flex items-center justify-center flex-shrink-0 mt-[6px]">
+            <div className="w-[11px] h-[11px] rounded-full bg-[#34c759]" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Assignment</h1>
+            <p className="text-sm text-slate-500 font-medium">Set up a new assignment for your students</p>
+          </div>
         </div>
 
         {/* Form Wizard Progress Indicator */}

@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import { uploadFile } from './s3Service';
 import { IAssessment } from '../models/Assessment';
+import Settings from '../models/Settings';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -10,6 +11,24 @@ dotenv.config();
  * Saves the PDF to S3/Local Storage and returns the file URL.
  */
 export const generateAssessmentPDF = async (assessment: IAssessment): Promise<string> => {
+  // Fetch dynamic settings from database
+  let schoolName = 'Delhi Public School';
+  let schoolAddress = 'Sector-4, Bokaro';
+  let subject = 'Science';
+  let className = '8th';
+
+  try {
+    const dbSettings = await Settings.findOne();
+    if (dbSettings) {
+      schoolName = dbSettings.schoolName;
+      schoolAddress = dbSettings.schoolAddress;
+      subject = dbSettings.subject;
+      className = dbSettings.className;
+    }
+  } catch (err) {
+    console.error('Failed to load settings in pdfService, using defaults:', err);
+  }
+
   let browser;
   try {
     browser = await puppeteer.launch({
@@ -119,10 +138,10 @@ export const generateAssessmentPDF = async (assessment: IAssessment): Promise<st
         <!-- School Header -->
         <div class="text-center mb-6">
           <h1 class="text-2xl font-header font-bold tracking-wider text-slate-900">
-            Delhi Public School, Sector-4, Bokaro
+            ${schoolName}, ${schoolAddress}
           </h1>
           <p class="text-sm uppercase tracking-widest text-slate-600 font-semibold mt-1">
-            Subject: English &bull; Class: 5th
+            Subject: ${subject} &bull; Class: ${className}
           </p>
         </div>
 
