@@ -121,36 +121,35 @@ export default function Dashboard() {
           </Link>
         </div>
       ) : assessments.length === 0 ? (
-        /* Empty State - Matching Screenshot 1.0 & 1.1 */
-        <div className="flex flex-col items-center justify-center min-h-[75vh] text-center px-4">
-          <div className="relative w-64 h-64 mb-8 flex items-center justify-center">
-            {/* Custom vector mock based on screenshots */}
-            <div className="absolute inset-0 bg-slate-200/50 rounded-full scale-90 blur-xl animate-pulse"></div>
-            <div className="relative w-40 h-40 bg-white border border-slate-200 rounded-3xl shadow-xl flex flex-col items-center justify-center p-6 transform -rotate-6">
-              <div className="w-12 h-2.5 bg-slate-200 rounded-full mb-3 self-start"></div>
-              <div className="w-20 h-2 bg-slate-100 rounded-full mb-2 self-start"></div>
-              <div className="w-16 h-2 bg-slate-100 rounded-full mb-6 self-start"></div>
-              
-              {/* Highlight cross */}
-              <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-white border border-slate-100 shadow-lg rounded-full flex items-center justify-center">
-                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-red-500 font-sans">&times;</span>
-                </div>
-              </div>
-            </div>
+        /* Empty State */
+        <div className="flex flex-col items-center justify-center min-h-[78vh] text-left sm:text-center px-2 sm:px-6">
+          {/* Illustration with circular backdrop */}
+          <div className="relative mb-8 select-none flex items-center justify-center self-center">
+            <div className="absolute w-[240px] h-[240px] sm:w-[260px] sm:h-[260px] rounded-full bg-white/60" style={{ filter: 'blur(2px)' }} />
+            <img
+              src="/image copy 2.png"
+              alt="No assignments illustration"
+              className="relative w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto"
+              draggable={false}
+            />
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">No assignments yet</h2>
-          <p className="text-slate-500 text-sm max-w-sm mt-3 leading-relaxed">
-            Create your first assignment to start collecting and grading student submissions. You can set up rubrics,
-            define marking criteria, and let AI assist with grading.
+          {/* Text */}
+          <h2 className="text-[22px] font-extrabold text-slate-800 tracking-tight font-bricolage">
+            No assignments yet
+          </h2>
+          <p className="text-slate-500 text-[14px] max-w-[600px] mt-3 leading-7">
+            Create your first assignment to start collecting and grading student<br className="hidden sm:block" />
+            submissions. You can set up rubrics, define marking criteria, and let AI assist<br className="hidden sm:block" />
+            with grading.
           </p>
 
+          {/* CTA */}
           <Link
             href="/create"
-            className="mt-8 py-3.5 px-6 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg shadow-slate-200 transform hover:scale-[1.02] cursor-pointer"
+            className="mt-8 w-full sm:w-auto py-3.5 sm:px-8 bg-[#0c0c0e] hover:bg-slate-800 text-white rounded-full font-bold text-[14px] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             Create Your First Assignment
           </Link>
         </div>
@@ -169,22 +168,27 @@ export default function Dashboard() {
             </div>
 
             {/* Filters & Search */}
-            <div className="bg-white rounded-[24px] py-2 px-6 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm border border-slate-100/50">
+            <div className="bg-white rounded-[24px] py-2 px-4 sm:px-6 flex flex-row gap-0 items-center justify-between shadow-sm border border-slate-100/50">
               {/* Filter By — interactive dropdown trigger */}
-              <div className="relative">
+              <div className="relative flex-shrink-0">
                 <div
                   onClick={(e) => { e.stopPropagation(); setFilterOpen(!filterOpen); }}
-                  className={`flex items-center gap-2 font-semibold text-[14px] cursor-pointer transition duration-200 select-none ${
+                  className={`flex items-center gap-2 font-semibold text-[14px] cursor-pointer transition duration-200 select-none pr-4 ${
                     filterOption !== 'newest' ? 'text-slate-700' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                   </svg>
-                  <span>
+                  <span className="hidden sm:inline">
                     {filterOption === 'newest' ? 'Filter By' :
                      filterOption === 'oldest' ? 'Oldest First' :
                      filterOption === 'az' ? 'A → Z' : 'Z → A'}
+                  </span>
+                  <span className="sm:hidden">
+                    {filterOption === 'newest' ? 'Filter' :
+                     filterOption === 'oldest' ? 'Oldest' :
+                     filterOption === 'az' ? 'A→Z' : 'Z→A'}
                   </span>
                   {filterOption !== 'newest' && (
                     <button
@@ -227,15 +231,18 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* Vertical divider */}
+              <div className="w-px h-5 bg-slate-200 flex-shrink-0" />
+
               {/* Search bar */}
-              <div className="relative w-full sm:w-[320px]">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <div className="relative flex-1 ml-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search Assignment"
+                  placeholder="Search Name"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-11 pr-5 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-300 transition duration-200"
+                  className="w-full pl-9 pr-4 py-2 bg-[#f4f4f5] border-0 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 transition duration-200"
                 />
               </div>
             </div>
