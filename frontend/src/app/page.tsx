@@ -91,7 +91,7 @@ export default function Dashboard() {
   );
 
   return (
-    <DashboardLayout title="Assignments">
+    <DashboardLayout title="Assignments" workspacePadding="pt-6 px-6 pb-0 md:pt-8 md:px-8 md:pb-0">
       {loading ? (
         <div className="flex flex-col items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800"></div>
@@ -148,7 +148,7 @@ export default function Dashboard() {
         </div>
       ) : (
         /* Populated State - Matching Screenshot 2.0 & 2.1 */
-        <div className="flex-1 flex flex-col justify-between relative pb-24">
+        <div className="relative">
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -250,6 +250,9 @@ export default function Dashboard() {
                 );
               })}
             </div>
+
+            {/* Layout spacer to bypass browser scroll padding bugs */}
+            <div className="h-28 flex-shrink-0" />
           </div>
 
           {/* Centered Floating Action Button at bottom (adjusted for sidebar and margins) */}
@@ -264,7 +267,7 @@ export default function Dashboard() {
           </div>
 
           {/* Bottom scroll fade overlay - Sticky inside card workspace */}
-          <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8]/90 to-transparent z-10 -mx-8 -mb-8 rounded-b-[24px]" />
+          <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#f5f6f8] to-transparent z-10 -mx-6 md:-mx-8 rounded-b-[24px]" />
         </div>
       )}
     </DashboardLayout>
