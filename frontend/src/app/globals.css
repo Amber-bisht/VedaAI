@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f6f8;
+  --background: #DEDEDE;
   --foreground: #0f172a;
   --card-bg: #ffffff;
   --border-color: #e2e8f0;

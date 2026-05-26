@@ -85,7 +85,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="flex h-screen bg-[#f5f6f8] overflow-hidden font-sans md:p-5 md:gap-5 justify-center items-center">
+    <div className="flex h-screen bg-[#DEDEDE] overflow-hidden font-sans md:p-5 md:gap-5 justify-center items-center">
       {/* Sidebar - Desktop */}
       <aside className="hidden md:flex md:flex-col md:w-[304px] md:h-full md:max-h-[756px] bg-white rounded-[24px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] border border-slate-100/50 flex-shrink-0 overflow-hidden">
         {/* Logo */}
@@ -328,7 +328,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content Workspace */}
-        <main className={`flex-1 overflow-y-auto ${workspacePadding} rounded-none md:rounded-[24px] border border-slate-100/50 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] ${workspaceBg}`}>
+        <main className={`flex-1 flex flex-col overflow-y-auto ${workspacePadding} rounded-none md:rounded-[24px] border border-slate-100/50 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] ${workspaceBg}`}>
           {children}
         </main>
       </div>
