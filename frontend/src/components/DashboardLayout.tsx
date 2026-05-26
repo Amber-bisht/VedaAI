@@ -56,6 +56,16 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(true);
+
+  // Close notifications on click outside
+  useEffect(() => {
+    const closeNotifications = () => setNotificationsOpen(false);
+    window.addEventListener('click', closeNotifications);
+    return () => window.removeEventListener('click', closeNotifications);
+  }, []);
+
   const assessments = useSelector((state: RootState) => state.assessmentResult.assessments);
   const settings = useSelector((state: RootState) => state.settings);
 
@@ -87,7 +97,7 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen bg-[#DEDEDE] overflow-hidden font-sans md:p-5 md:gap-5 justify-center items-center">
       {/* Sidebar - Desktop */}
-      <aside className="hidden md:flex md:flex-col md:w-[304px] md:h-full md:max-h-[756px] bg-white rounded-[24px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] border border-slate-100/50 flex-shrink-0 overflow-hidden">
+      <aside className="hidden md:flex md:flex-col md:w-[304px] md:h-full md:max-h-[756px] bg-white rounded-[24px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] flex-shrink-0 overflow-hidden">
         {/* Logo */}
         <div className="p-6 border-b border-slate-100 flex items-center gap-3">
           <img
@@ -240,7 +250,7 @@ export default function DashboardLayout({
       {/* Main Page Area */}
       <div className="flex-1 flex flex-col gap-4 md:gap-5 h-full md:h-full md:max-h-[756px]">
         {/* Top Header */}
-        <header className="h-16 bg-white rounded-none md:rounded-[24px] border border-slate-100/50 flex items-center justify-between px-6 flex-shrink-0 z-10 relative shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)]">
+        <header className="h-16 bg-white rounded-none md:rounded-[24px] flex items-center justify-between px-6 flex-shrink-0 z-10 relative shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)]">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -302,10 +312,78 @@ export default function DashboardLayout({
 
           <div className="flex items-center gap-3">
             {/* Notification Bell */}
-            <button className="w-10 h-10 bg-[#f4f4f5] hover:bg-[#e4e4e7] text-slate-800 rounded-full relative flex items-center justify-center transition-all duration-200 cursor-pointer">
-              <Bell className="w-5 h-5 text-slate-700" />
-              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#ff5a36] rounded-full border-2 border-white"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setNotificationsOpen(!notificationsOpen);
+                  setUnreadNotifications(false);
+                }}
+                className="w-10 h-10 bg-[#f4f4f5] hover:bg-[#e4e4e7] text-slate-800 rounded-full relative flex items-center justify-center transition-all duration-200 cursor-pointer"
+              >
+                <Bell className="w-5 h-5 text-slate-700" />
+                {unreadNotifications && (
+                  <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#ff5a36] rounded-full border-2 border-white"></span>
+                )}
+              </button>
+
+              {/* Notification Dropdown Menu */}
+              {notificationsOpen && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 mt-2.5 w-[320px] bg-white border border-slate-100/50 rounded-2xl shadow-[0_20px_45px_-5px_rgba(0,0,0,0.1),0_5px_15px_-3px_rgba(0,0,0,0.05)] z-30 overflow-hidden"
+                  style={{ top: '100%' }}
+                >
+                  <div className="p-4 border-b border-slate-100/80 flex items-center justify-between">
+                    <span className="font-bold text-slate-800 text-sm">Notifications</span>
+                    <button
+                      onClick={() => setUnreadNotifications(false)}
+                      className="text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                  <div className="max-h-[280px] overflow-y-auto divide-y divide-slate-50">
+                    <div className="p-4 hover:bg-slate-50 transition duration-200 cursor-pointer">
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 bg-[#4ade80] rounded-full mt-1.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-slate-700 leading-tight">Assessment Generated</p>
+                          <p className="text-xs text-slate-500 mt-1 leading-normal">
+                            "Quiz on Electricity" has been successfully compiled and is ready for download.
+                          </p>
+                          <span className="text-[10px] text-slate-400 font-semibold mt-1.5 block">Just now</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 hover:bg-slate-50 transition duration-200 cursor-pointer">
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 bg-[#ff5a36] rounded-full mt-1.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-slate-700 leading-tight">New Submissions</p>
+                          <p className="text-xs text-slate-500 mt-1 leading-normal">
+                            3 students have submitted "Quiz on Electricity".
+                          </p>
+                          <span className="text-[10px] text-slate-400 font-semibold mt-1.5 block">2 hours ago</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 hover:bg-slate-50 transition duration-200 cursor-pointer">
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 bg-[#4ade80] rounded-full mt-1.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-slate-700 leading-tight">System Ready</p>
+                          <p className="text-xs text-slate-500 mt-1 leading-normal">
+                            Connected successfully to VedaAI live servers.
+                          </p>
+                          <span className="text-[10px] text-slate-400 font-semibold mt-1.5 block">1 day ago</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Profile Dropdown Container Card */}
             <div 
@@ -315,12 +393,12 @@ export default function DashboardLayout({
               <div className="w-8 h-8 rounded-full overflow-hidden bg-[#ffe9e3] flex-shrink-0 flex items-center justify-center">
                 <img
                   src="/image.png"
-                  alt="John Doe"
+                  alt={settings.teacherName || 'Teacher'}
                   className="w-8 h-8 object-cover mix-blend-multiply"
                 />
               </div>
               <span className="hidden sm:inline text-sm font-bold text-slate-700 group-hover:text-slate-800 transition-colors">
-                John Doe
+                {settings.teacherName || 'Teacher'}
               </span>
               <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-500 transition-colors" />
             </div>
@@ -328,7 +406,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content Workspace */}
-        <main className={`flex-1 flex flex-col overflow-y-auto ${workspacePadding} rounded-none md:rounded-[24px] border border-slate-100/50 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] ${workspaceBg}`}>
+        <main className={`flex-1 flex flex-col overflow-y-auto ${workspacePadding} rounded-none md:rounded-[24px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] ${workspaceBg}`}>
           {children}
         </main>
       </div>
