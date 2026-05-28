@@ -1,0 +1,138 @@
+name: VedaAI Backend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'packages/backend/**'
+      - 'packages/shared/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'packages/backend/**'
+      - 'packages/shared/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  verify-and-test:
+    name: Verify & Build Monorepo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (v22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Workspaces Dependencies
+        run: npm ci
+
+      - name: Compile Workspaces (Shared + Backend)
+        run: |
+          npm run build --workspace=@veda-ai/shared
+          npm run build --workspace=@veda-ai/backend
+
+  docker-build-deploy:
+    name: Build Docker & Deploy via SSH
+    runs-on: ubuntu-latest
+    needs: verify-and-test
+    # Only deploy on direct push to main or master branch
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # Convert repository name to lowercase as required by GHCR
+      - name: Downcase Repository Name for Docker Tag
+        run: |
+          echo "IMAGE_NAME=ghcr.io/${{ github.repository }}/backend" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: packages/backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to Remote Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            # 1. Create deployment directory
+            mkdir -p ~/veda-ai
+            cd ~/veda-ai
+
+            # 2. Inject the production .env file from secrets
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # 3. Create the docker-compose.yml file dynamically
+            cat << 'EOF' > docker-compose.yml
+            version: '3.8'
+
+            services:
+              backend:
+                image: ${{ env.IMAGE_NAME }}:latest
+                ports:
+                  - "5001:5001"
+                env_file:
+                  - .env
+                environment:
+                  - REDIS_URL=redis://redis:6379
+                depends_on:
+                  - redis
+                restart: always
+
+              redis:
+                image: redis:7-alpine
+                ports:
+                  - "6379:6379"
+                volumes:
+                  - redis_data:/data
+                restart: always
+
+            volumes:
+              redis_data:
+            EOF
+
+            # 4. Authenticate remote docker with GHCR using transient GitHub Actions token
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # 5. Pull the fresh image and restart the compose services
+            docker compose pull backend
+            docker compose up -d
+
+            # 6. Housekeep old unused Docker images/containers to conserve disk space
+            docker image prune -f

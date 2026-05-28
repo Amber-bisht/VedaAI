@@ -1,0 +1,37 @@
+# Exclude dependencies
+node_modules/
+packages/*/node_modules/
+
+# Exclude build output
+dist/
+packages/*/dist/
+.next/
+packages/*/out/
+packages/*/build/
+*.tsbuildinfo
+
+# Exclude secrets and configurations
+.env
+.env.*
+!.env.example
+*.pem
+
+# Exclude local storage and cache files
+packages/backend/uploads/
+.cache/
+.npm/
+
+# Exclude Git files
+.git
+.gitignore
+
+# Exclude logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Exclude OS-generated files
+.DS_Store
+Thumbs.db
