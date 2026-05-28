@@ -17,11 +17,30 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Configure CORS
-const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+// Configure CORS with multiple allowed origins
+const clientUrlEnv = process.env.CLIENT_URL || 'http://localhost:3000';
+const allowedOrigins = clientUrlEnv.split(',').map(url => url.trim());
+
+// Always include the production frontend domain and local development origin
+const defaultOrigins = ['http://localhost:3000', 'https://vedaai.amberbisht.me'];
+defaultOrigins.forEach(origin => {
+  if (!allowedOrigins.includes(origin)) {
+    allowedOrigins.push(origin);
+  }
+});
+
 app.use(
   cors({
-    origin: clientUrl,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, postman, or server-to-server)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true
   })
 );
@@ -35,10 +54,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Socket.io initialization
+// Socket.io initialization supporting multiple CORS origins
 const io = new Server(server, {
   cors: {
-    origin: clientUrl,
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true
   }

@@ -101,6 +101,52 @@ npm run dev:frontend    # Next.js on http://localhost:3000
 npm run dev:backend     # Express on http://localhost:5001
 ```
 
+## 🐳 Docker & Deployment
+
+### Local Development with Docker
+
+To spin up the backend API and Redis queue container locally:
+
+1. Make sure you have **Docker** and **Docker Compose** installed.
+2. Ensure you have configured the `packages/backend/.env` file.
+3. Start the services:
+   ```bash
+   docker compose up --build
+   ```
+
+The containerized backend will be accessible on `http://localhost:5001`.
+
+---
+
+### GitHub Actions CI/CD (SSH Deployment)
+
+This project includes an automated GitHub Actions pipeline under `.github/workflows/ci.yml` that builds and deploys the backend container to your self-hosted remote server (VPS/VM) on push to the `main` or `master` branches.
+
+#### 🗝️ Required Repository Secrets
+To enable the automated deployment, add the following under **Settings > Secrets and variables > Actions** in your GitHub repository:
+
+| Secret | Description |
+|--------|-------------|
+| `SSH_HOST` | The public IP address or domain name of your remote server |
+| `SSH_USERNAME` | The SSH username (typically `root` or `ubuntu`) |
+| `SSH_PASSWORD` | The password for the SSH user |
+| `ENV_FILE` | The complete, multi-line content of your production `packages/backend/.env` file |
+
+#### How Deployment Works:
+1. **CI**: Verifies the workspace dependencies install and the TypeScript packages build successfully.
+2. **Docker Build**: Packages the Express server (injecting all Puppeteer/Chromium OS-level dependencies) and pushes it to **GitHub Container Registry (GHCR)**.
+3. **SSH Deploy**: Connects to the remote server via SSH, writes your production `ENV_FILE` to `.env`, pulls the fresh Docker image from GHCR, and runs `docker compose up -d` to restart the services gracefully.
+
+---
+
+### Frontend Hosting (Vercel)
+
+The frontend is fully optimized to be deployed on **Vercel** with zero Docker setup. When setting up the project on Vercel, configure the following Environment Variable:
+
+- **`NEXT_PUBLIC_BACKEND_URL`**: Set this to the public URL where your containerized backend is running (e.g., `http://your-server-ip:5001` or `https://api.yourdomain.com`).
+
+---
+
 ## 📜 Available Scripts
 
 All scripts run from the **project root**:
