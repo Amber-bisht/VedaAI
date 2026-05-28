@@ -595,12 +595,12 @@ export default function CreateAssignment() {
               </div>
             </div>
 
-            {/* Step Footer Navigation */}
-            <div className="flex justify-between items-center">
+            {/* Step Footer Navigation — fixed above bottom tab bar on mobile, inline on desktop */}
+            <div className="fixed bottom-[104px] left-0 right-0 z-30 md:static md:z-auto px-4 pb-2 md:p-0 flex justify-between items-center gap-3">
               <button
                 type="button"
                 onClick={() => router.push('/')}
-                className="py-3 px-6 bg-white border border-slate-200 text-slate-700 font-semibold rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer"
+                className="flex-1 md:flex-none py-3 px-6 bg-white border border-slate-200 text-slate-700 font-semibold rounded-full md:rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Previous
@@ -608,7 +608,7 @@ export default function CreateAssignment() {
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl flex items-center gap-2 cursor-pointer shadow-lg shadow-slate-100"
+                className="flex-1 md:flex-none py-3 px-6 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-full md:rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-slate-100"
               >
                 Next
                 <ArrowRight className="w-4 h-4" />

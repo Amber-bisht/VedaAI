@@ -301,13 +301,14 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    {/* Clean bottom layout, no top border line, precise font spacing around colons */}
-                    <div className="flex items-center justify-between text-[13px] text-slate-400 font-medium mt-6 select-none">
-                      <span>
-                        Assigned on: <span className="text-slate-600 font-semibold ml-0.5">{formatDate(a.createdAt)}</span>
+                    <div className="flex items-center justify-between mt-6 select-none">
+                      <span className="text-[13px]">
+                        <span className="font-bold text-slate-800">Assigned on : </span>
+                        <span className="text-slate-400 font-medium">{formatDate(a.createdAt)}</span>
                       </span>
-                      <span>
-                        Due: <span className="text-slate-600 font-semibold ml-0.5">{formatDate(a.dueDate)}</span>
+                      <span className="text-[13px]">
+                        <span className="font-bold text-slate-800">Due : </span>
+                        <span className="text-slate-400 font-medium">{formatDate(a.dueDate)}</span>
                       </span>
                     </div>
                   </div>

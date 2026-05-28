@@ -44,7 +44,8 @@ export default function DashboardLayout({
   showBackButton = false,
   workspaceBg = 'bg-[#f5f6f8]',
   workspacePadding = 'p-6 md:p-8',
-  sidebarButtonText = 'Create Assignment'
+  sidebarButtonText = 'Create Assignment',
+  hideBottomTab = false
 }: {
   children: React.ReactNode;
   title?: string;
@@ -52,6 +53,7 @@ export default function DashboardLayout({
   workspaceBg?: string;
   workspacePadding?: string;
   sidebarButtonText?: string;
+  hideBottomTab?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -382,8 +384,7 @@ export default function DashboardLayout({
 
               {/* Profile Pill */}
               <div
-                className="bg-white border border-slate-100/50 rounded-full px-4 py-1.5 flex items-center gap-3 hover:bg-slate-50 transition-all duration-200 cursor-pointer group"
-                style={{ boxShadow: '0px 32px 48px 0px rgba(0, 0, 0, 0.20), 0px 16px 48px 0px rgba(0, 0, 0, 0.12)' }}
+                className="bg-slate-50 border border-slate-100 rounded-full px-4 py-1.5 flex items-center gap-3 hover:bg-slate-100 transition-all duration-200 cursor-pointer group"
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-[#ffe9e3] flex-shrink-0 flex items-center justify-center">
                   <img
@@ -494,7 +495,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Mobile Bottom Tab Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-4 pb-5 pointer-events-none">
+      {!hideBottomTab && <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-4 pb-5 pointer-events-none">
         {/* Floating + FAB */}
         <div className="flex justify-end mb-3 pointer-events-auto">
           <Link
@@ -549,7 +550,7 @@ export default function DashboardLayout({
             <span className="text-[11px] font-medium text-slate-400">AI Toolkit</span>
           </Link>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

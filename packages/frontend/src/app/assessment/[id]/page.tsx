@@ -166,6 +166,7 @@ export default function AssessmentDetails() {
       workspaceBg="bg-[#525252]"
       workspacePadding="pt-4 pb-6 px-6 md:pt-4 md:pb-8 md:px-8"
       sidebarButtonText="AI Teacher's Toolkit"
+      hideBottomTab={true}
     >
       {loading ? (
         <div className="flex flex-col items-center justify-center h-96">
