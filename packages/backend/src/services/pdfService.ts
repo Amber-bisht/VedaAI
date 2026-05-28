@@ -8,7 +8,7 @@ dotenv.config();
 
 /**
  * Renders the assessment document as HTML and uses Puppeteer to compile it into an A4 PDF.
- * Saves the PDF to S3/Local Storage and returns the file URL.
+ * Saves the PDF to S3 and returns the file URL.
  */
 export const generateAssessmentPDF = async (assessment: IAssessment): Promise<string> => {
   // Fetch dynamic settings from database

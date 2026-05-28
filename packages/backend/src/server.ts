@@ -3,7 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import path from 'path';
+
 import dotenv from 'dotenv';
 import { QueueEvents } from 'bullmq';
 
@@ -29,9 +29,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve local uploads as static folder
-const uploadsPath = path.join(__dirname, '../uploads');
-app.use('/uploads', express.static(uploadsPath));
+
 
 // API Routes
 app.use('/api/assessments', assessmentRoutes);
@@ -62,7 +60,7 @@ io.on('connection', (socket) => {
 // Setup Queue Events for real-time socket progress propagation
 const setupQueueEvents = () => {
   const queueEvents = new QueueEvents('assessment-generation', {
-    connection: redisConnection
+    connection: redisConnection as any
   });
 
   queueEvents.on('progress', ({ jobId, data }: { jobId: string; data: any }) => {

@@ -1,0 +1,16 @@
+{
+  "name": "veda-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace=@veda-ai/backend & npm run dev --workspace=@veda-ai/frontend",
+    "dev:frontend": "npm run dev --workspace=@veda-ai/frontend",
+    "dev:backend": "npm run dev --workspace=@veda-ai/backend",
+    "build": "npm run build --workspaces --if-present",
+    "build:frontend": "npm run build --workspace=@veda-ai/frontend",
+    "build:backend": "npm run build --workspace=@veda-ai/backend",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "rm -rf packages/*/node_modules packages/*/.next packages/*/dist node_modules"
+  }
+}

@@ -106,7 +106,7 @@ export const startAssessmentWorker = () => {
       }
     },
     {
-      connection: redisConnection,
+      connection: redisConnection as any,
       concurrency: 2
     }
   );

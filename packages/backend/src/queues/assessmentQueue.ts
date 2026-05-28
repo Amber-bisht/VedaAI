@@ -13,5 +13,5 @@ export const redisConnection = new IORedis(redisUrl, {
 
 // Setup assessment generation queue
 export const assessmentQueue = new Queue('assessment-generation', {
-  connection: redisConnection
+  connection: redisConnection as any
 });

@@ -1,5 +1,5 @@
 {
-  "name": "veda-ai-backend",
+  "name": "@veda-ai/backend",
   "version": "1.0.0",
   "description": "VedaAI Assessment Creator Backend",
   "main": "dist/server.js",
