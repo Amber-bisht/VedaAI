@@ -185,7 +185,7 @@ export default function AssessmentDetails() {
           <div className="bg-[#272727] rounded-3xl p-6 text-white space-y-4 shadow-lg shadow-slate-950/10 relative overflow-hidden">
             <div className="space-y-1 z-10">
               <p className="text-sm md:text-base font-semibold leading-relaxed font-sans">
-                Certainly, {settings.teacherName || 'Lakshya'}! Here are customized Question Paper for your CBSE Grade {settings.className} {settings.subject} classes on the NCERT chapters:
+                Certainly, {settings.teacherName || 'Lakshya'}! Here are customized Question Paper for your CBSE Grade {assessment.className || settings.className || '8th'} {assessment.subject || settings.subject || 'Science'} classes on the NCERT chapters:
               </p>
             </div>
 
@@ -214,10 +214,10 @@ export default function AssessmentDetails() {
                 {settings.schoolName}, {settings.schoolAddress}
               </h1>
               <p className="text-sm font-bold text-slate-800 font-sans mt-2">
-                Subject: {settings.subject}
+                Subject: {assessment.subject || settings.subject || 'Science'}
               </p>
               <p className="text-sm font-bold text-slate-800 font-sans mt-0.5">
-                Class: {settings.className}
+                Class: {assessment.className || settings.className || '8th'}
               </p>
             </div>
 
@@ -243,7 +243,7 @@ export default function AssessmentDetails() {
                 <div className="border-b border-slate-400 flex-grow max-w-[280px] h-4"></div>
               </div>
               <div className="flex items-center gap-1.5">
-                <span>Class: {settings.className} Section:</span>
+                <span>Class: {assessment.className || settings.className || '8th'} Section:</span>
                 <div className="border-b border-slate-400 flex-grow max-w-[280px] h-4"></div>
               </div>
             </div>

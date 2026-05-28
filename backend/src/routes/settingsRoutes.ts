@@ -28,7 +28,7 @@ router.get('/', async (_req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { schoolName, schoolAddress, subject, className, teacherName } = req.body;
+    const { schoolName, schoolAddress, teacherName } = req.body;
 
     let settings = await Settings.findOne();
     if (!settings) {
@@ -37,8 +37,6 @@ router.post('/', async (req: Request, res: Response) => {
 
     if (schoolName !== undefined) settings.schoolName = schoolName;
     if (schoolAddress !== undefined) settings.schoolAddress = schoolAddress;
-    if (subject !== undefined) settings.subject = subject;
-    if (className !== undefined) settings.className = className;
     if (teacherName !== undefined) settings.teacherName = teacherName;
 
     await settings.save();

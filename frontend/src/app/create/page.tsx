@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import {
   setTitle,
+  setSubject,
+  setClassName,
   setDueDate,
   setInstructions,
   updateQuestionType,
@@ -36,7 +38,8 @@ import {
   AlertTriangle,
   Loader2,
   CheckCircle,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 
 export default function CreateAssignment() {
@@ -45,7 +48,7 @@ export default function CreateAssignment() {
 
   // Redux Form State
   const formState = useSelector((state: RootState) => state.assessmentForm);
-  const { title, dueDate, instructions, questionTypes, uploadedFile, step } = formState;
+  const { title, subject, className, dueDate, instructions, questionTypes, uploadedFile, step } = formState;
 
   // Redux Result/Generation State
   const generationState = useSelector((state: RootState) => state.assessmentResult.generation);
@@ -215,6 +218,14 @@ export default function CreateAssignment() {
         setFormError('Please enter an assignment title.');
         return;
       }
+      if (!subject.trim()) {
+        setFormError('Please enter a subject name.');
+        return;
+      }
+      if (!className.trim()) {
+        setFormError('Please enter a class (e.g. 8th).');
+        return;
+      }
       if (!dueDate) {
         setFormError('Please select a due date.');
         return;
@@ -232,6 +243,8 @@ export default function CreateAssignment() {
       try {
         const formData = new FormData();
         formData.append('title', title);
+        formData.append('subject', subject);
+        formData.append('className', className);
         formData.append('dueDate', dueDate);
         formData.append('instructions', instructions);
         formData.append(
@@ -270,7 +283,7 @@ export default function CreateAssignment() {
   };
 
   return (
-    <DashboardLayout title="Assignment" showBackButton={true}>
+    <DashboardLayout title="Assignment" showBackButton={true} workspaceBg="bg-[#DEDEDE]" workspacePadding="pt-4 pb-8 px-4 md:pt-5 md:px-6">
       <div className="w-full space-y-6">
         <div className="flex items-start gap-3.5">
           {/* Green Status Indicator Dot */}
@@ -302,42 +315,37 @@ export default function CreateAssignment() {
               </div>
             )}
 
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm">
+            <div className="bg-white/50 border border-slate-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm backdrop-blur-md">
               <div>
                 <h2 className="text-lg font-bold text-slate-800">Assignment Details</h2>
                 <p className="text-xs text-slate-400 font-medium mt-0.5">Basic information about your assignment</p>
               </div>
 
-              {/* Editable Assignment Title */}
+              {/* File Uploader Dropzone — FIRST & most prominent */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Assignment Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => dispatch(setTitle(e.target.value))}
-                  placeholder="e.g. Quiz on Electricity"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-800"
-                />
-              </div>
-
-              {/* File Uploader Dropzone */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Reference Materials</label>
                 {!uploadedFile ? (
                   <div
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    className="border-2 border-dashed border-slate-300 hover:border-slate-400 rounded-3xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer bg-slate-50/50"
+                    className="bg-white rounded-3xl flex flex-col items-center justify-center text-center transition-all cursor-pointer hover:bg-slate-50/50 w-full mx-auto"
+                    style={{
+                      border: '1.75px dashed #00000033',
+                      width: '100%',
+                      height: '240px',
+                      padding: '36px 48px',
+                      gap: '20px',
+                    }}
+                    onClick={triggerBrowseFiles}
                   >
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md mb-4 text-slate-500">
-                      <Upload className="w-6 h-6" />
+                    <div className="text-slate-500">
+                      <Upload className="w-10 h-10 mx-auto" strokeWidth={1.8} />
                     </div>
-                    <p className="text-sm font-bold text-slate-700">Choose a file or drag & drop it here</p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 mb-4">PDF, TXT, JPEG, PNG, upto 10MB</p>
+                    <p className="text-base font-bold text-slate-700">Choose a file or drag & drop it here</p>
+                    <p className="text-sm text-slate-400 font-medium">JPEG, PNG, upto 10MB</p>
                     <button
                       type="button"
-                      onClick={triggerBrowseFiles}
-                      className="py-2 px-5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 font-semibold text-xs rounded-xl shadow-sm transition cursor-pointer"
+                      onClick={(e) => { e.stopPropagation(); triggerBrowseFiles(); }}
+                      className="py-2.5 px-8 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm rounded-full shadow-sm transition cursor-pointer"
                     >
                       Browse Files
                     </button>
@@ -371,45 +379,86 @@ export default function CreateAssignment() {
                     </button>
                   </div>
                 )}
-                <p className="text-xs text-slate-400 font-medium mt-2 text-center">
-                  Upload images or documents of your preferred context materials.
+                <p className="text-xs text-slate-400 font-medium mt-3 text-center">
+                  Upload images of your preferred document/image
                 </p>
               </div>
 
-              {/* Due Date Input */}
+              {/* Editable Assignment Title */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Due Date</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Assignment Title</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => dispatch(setTitle(e.target.value))}
+                  placeholder="e.g. Quiz on Electricity"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-800"
+                />
+              </div>
+
+              {/* Subject Name and Class Inputs Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Subject Name</label>
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => dispatch(setSubject(e.target.value))}
+                    placeholder="e.g. Science"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Class</label>
+                  <input
+                    type="text"
+                    value={className}
+                    onChange={(e) => dispatch(setClassName(e.target.value))}
+                    placeholder="e.g. 8th"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* Due Date Input */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-slate-700">Due Date</label>
                 <div className="relative">
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => dispatch(setDueDate(e.target.value))}
-                    className="w-full pl-4 pr-11 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-semibold text-slate-700 cursor-pointer"
+                    placeholder="DD-MM-YYYY"
+                    className="w-full pl-6 pr-12 py-3.5 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-700 bg-white shadow-sm transition cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-5 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:w-5 [&::-webkit-calendar-picker-indicator]:h-5 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:z-10"
                   />
-                  <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                 </div>
               </div>
 
               {/* Dynamic Question Type Config Table */}
-              <div className="space-y-4 pt-2">
-                <div className="flex justify-between items-center">
-                  <label className="block text-sm font-bold text-slate-700">Question Types Matrix</label>
+              <div className="space-y-3 pt-2">
+
+                {/* Desktop Headers to align perfectly with rows */}
+                <div className="hidden sm:flex items-center gap-4 px-2 pb-1 text-sm font-bold text-slate-500 select-none">
+                  <div className="flex-1">Question Type</div>
+                  <div className="w-[120px] text-center">No. of Questions</div>
+                  <div className="w-[120px] text-center">Marks</div>
                 </div>
 
                 <div className="space-y-3">
                   {questionTypes.map((qt, idx) => (
                     <div
                       key={idx}
-                      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl relative"
+                      className="flex items-center gap-3 sm:gap-4 py-1"
                     >
-                      {/* Select Field */}
-                      <div className="flex-1">
+                      {/* Select Field Pill */}
+                      <div className="flex-1 relative">
                         <select
                           value={qt.type}
                           onChange={(e) =>
                             dispatch(updateQuestionType({ index: idx, field: 'type', value: e.target.value }))
                           }
-                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-800 font-semibold"
+                          className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-full text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 shadow-sm appearance-none cursor-pointer"
                         >
                           {questionTypeOptions.map((opt) => (
                             <option key={opt} value={opt}>
@@ -417,135 +466,129 @@ export default function CreateAssignment() {
                             </option>
                           ))}
                         </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <ChevronDown className="w-4.5 h-4.5" />
+                        </div>
                       </div>
 
-                      {/* Counters Blocks (Quantity and Marks) */}
-                      <div className="flex items-center justify-between sm:justify-start gap-4">
-                        {/* Quantity Counter */}
-                        <div className="flex flex-col items-center">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">
-                            No. of Questions
-                          </span>
-                          <div className="flex items-center border border-slate-200 bg-white rounded-xl overflow-hidden h-9">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuestionType({
-                                    index: idx,
-                                    field: 'count',
-                                    value: Math.max(1, qt.count - 1)
-                                  })
-                                )
-                              }
-                              className="px-3 h-full hover:bg-slate-50 text-slate-500 font-bold transition cursor-pointer"
-                            >
-                              -
-                            </button>
-                            <span className="w-10 text-center text-sm font-bold text-slate-800">{qt.count}</span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuestionType({ index: idx, field: 'count', value: qt.count + 1 })
-                                )
-                              }
-                              className="px-3 h-full hover:bg-slate-50 text-slate-500 font-bold transition cursor-pointer"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
+                      {/* Static Multiplication Symbol × which also acts as remove row button */}
+                      <button
+                        type="button"
+                        onClick={() => dispatch(removeQuestionType(idx))}
+                        className="text-slate-500 hover:text-red-500 font-bold text-lg sm:text-xl transition duration-150 cursor-pointer px-1 hover:scale-110"
+                        title="Remove Row"
+                      >
+                        ×
+                      </button>
 
-                        {/* Marks Counter */}
-                        <div className="flex flex-col items-center">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">
-                            Marks each
-                          </span>
-                          <div className="flex items-center border border-slate-200 bg-white rounded-xl overflow-hidden h-9">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuestionType({
-                                    index: idx,
-                                    field: 'marks',
-                                    value: Math.max(1, qt.marks - 1)
-                                  })
-                                )
-                              }
-                              className="px-3 h-full hover:bg-slate-50 text-slate-500 font-bold transition cursor-pointer"
-                            >
-                              -
-                            </button>
-                            <span className="w-10 text-center text-sm font-bold text-slate-800">{qt.marks}</span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuestionType({ index: idx, field: 'marks', value: qt.marks + 1 })
-                                )
-                              }
-                              className="px-3 h-full hover:bg-slate-50 text-slate-500 font-bold transition cursor-pointer"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Delete Row button */}
+                      {/* Quantity Counter Pill */}
+                      <div className="flex items-center bg-white border border-slate-200 rounded-full shadow-sm h-[48px] w-[110px] sm:w-[120px] justify-between px-3.5 select-none">
                         <button
                           type="button"
-                          onClick={() => dispatch(removeQuestionType(idx))}
-                          className="p-2 mt-4 sm:mt-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                          onClick={() =>
+                            dispatch(
+                              updateQuestionType({
+                                index: idx,
+                                field: 'count',
+                                value: Math.max(1, qt.count - 1)
+                              })
+                            )
+                          }
+                          className="text-slate-350 hover:text-slate-650 font-bold text-lg transition cursor-pointer px-1"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          −
+                        </button>
+                        <span className="text-sm font-extrabold text-slate-800">{qt.count}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            dispatch(
+                              updateQuestionType({ index: idx, field: 'count', value: qt.count + 1 })
+                            )
+                          }
+                          className="text-slate-350 hover:text-slate-650 font-bold text-lg transition cursor-pointer px-1"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Marks Counter Pill */}
+                      <div className="flex items-center bg-white border border-slate-200 rounded-full shadow-sm h-[48px] w-[110px] sm:w-[120px] justify-between px-3.5 select-none">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            dispatch(
+                              updateQuestionType({
+                                index: idx,
+                                field: 'marks',
+                                value: Math.max(1, qt.marks - 1)
+                              })
+                            )
+                          }
+                          className="text-slate-350 hover:text-slate-650 font-bold text-lg transition cursor-pointer px-1"
+                        >
+                          −
+                        </button>
+                        <span className="text-sm font-extrabold text-slate-800">{qt.marks}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            dispatch(
+                              updateQuestionType({ index: idx, field: 'marks', value: qt.marks + 1 })
+                            )
+                          }
+                          className="text-slate-350 hover:text-slate-650 font-bold text-lg transition cursor-pointer px-1"
+                        >
+                          +
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
 
+                {/* Add Question Button & Totals Panel */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
                   <button
                     type="button"
                     onClick={() => dispatch(addQuestionType())}
-                    className="flex items-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition duration-200 cursor-pointer"
+                    className="flex items-center gap-3 py-2 text-slate-800 hover:text-slate-900 transition duration-200 cursor-pointer group"
                   >
-                    <Plus className="w-4 h-4" />
-                    <span>Add Question Type</span>
+                    <div className="w-9 h-9 rounded-full bg-slate-900 group-hover:bg-slate-800 flex items-center justify-center transition">
+                      <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">Add Question Type</span>
                   </button>
 
-                  <div className="text-right self-end font-semibold text-slate-600 text-sm">
-                    <div>Total Questions : <strong className="text-slate-800 font-bold">{totalQuestions}</strong></div>
-                    <div>Total Marks : <strong className="text-slate-800 font-bold">{totalMarks}</strong></div>
+                  <div className="text-right self-end font-medium text-slate-500 text-sm space-y-1">
+                    <div>Total Questions : <span className="text-slate-800 font-bold">{totalQuestions}</span></div>
+                    <div>Total Marks : <span className="text-slate-800 font-bold">{totalMarks}</span></div>
                   </div>
                 </div>
               </div>
 
               {/* Extra Guidelines Textarea with Speech simulator */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-slate-700">
                   Additional Information (For better output)
                 </label>
-                <div className="relative">
+                <div className="relative bg-slate-50/50 rounded-3xl border border-dashed border-slate-350 hover:border-slate-450 transition duration-200 p-4">
                   <textarea
-                    rows={4}
-                    value={instructions}
-                    onChange={(e) => dispatch(setInstructions(e.target.value))}
-                    placeholder="e.g. Generate a question paper for 3 hour exam duration containing simple conceptual diagrams and focusing on electromagnetism..."
-                    className="w-full pl-4 pr-12 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium text-slate-800 resize-none"
+                     rows={4}
+                     value={instructions}
+                     onChange={(e) => dispatch(setInstructions(e.target.value))}
+                     placeholder="e.g Generate a question paper for 3 hour exam duration..."
+                     className="w-full bg-transparent border-0 rounded-2xl text-sm focus:outline-none font-medium text-slate-800 placeholder-slate-400 resize-none pr-12 pb-8"
                   />
                   <button
                     type="button"
                     onClick={toggleSpeechInput}
-                    className={`absolute right-4 bottom-4 p-2 rounded-xl border transition cursor-pointer ${
+                    className={`absolute right-5 bottom-5 p-2 rounded-full border transition cursor-pointer shadow-sm ${
                       isListening
                         ? 'bg-red-500 border-red-500 text-white animate-pulse'
-                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                        : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-100 hover:text-slate-700'
                     }`}
                   >
-                    <Mic className="w-4 h-4" />
+                    <Mic className="w-4.5 h-4.5" />
                   </button>
                 </div>
               </div>
@@ -574,7 +617,7 @@ export default function CreateAssignment() {
         ) : (
           /* STEP 2: GENERATION SCREEN - Loading Queue Progress */
           <div className="space-y-6">
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px] text-center shadow-sm">
+            <div className="bg-white/50 border border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px] text-center shadow-sm backdrop-blur-md">
               {genStatus === 'pending' || genStatus === 'processing' ? (
                 <>
                   <div className="relative mb-6">

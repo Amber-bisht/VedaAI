@@ -26,8 +26,6 @@ export default function SettingsPage() {
   // Form states
   const [schoolName, setSchoolName] = useState(settings.schoolName);
   const [schoolAddress, setSchoolAddress] = useState(settings.schoolAddress);
-  const [subject, setSubject] = useState(settings.subject);
-  const [className, setClassName] = useState(settings.className);
   const [teacherName, setTeacherName] = useState(settings.teacherName || 'Lakshya');
 
   const [saving, setSaving] = useState(false);
@@ -37,8 +35,6 @@ export default function SettingsPage() {
   useEffect(() => {
     setSchoolName(settings.schoolName);
     setSchoolAddress(settings.schoolAddress);
-    setSubject(settings.subject);
-    setClassName(settings.className);
     setTeacherName(settings.teacherName || 'Lakshya');
   }, [settings]);
 
@@ -59,8 +55,6 @@ export default function SettingsPage() {
         body: JSON.stringify({
           schoolName,
           schoolAddress,
-          subject,
-          className,
           teacherName
         })
       });
@@ -175,52 +169,6 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            {/* Subject and Class Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Default Subject input */}
-              <div className="space-y-1.5">
-                <label htmlFor="subject" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Default Subject
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <BookOpen className="h-4.5 w-4.5 text-slate-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="subject"
-                    id="subject"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    required
-                    placeholder="e.g. Science"
-                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200/80 focus:border-slate-400 focus:bg-white rounded-[16px] text-slate-800 placeholder-slate-400 font-medium text-sm focus:outline-none transition duration-150"
-                  />
-                </div>
-              </div>
-
-              {/* Default Class input */}
-              <div className="space-y-1.5">
-                <label htmlFor="className" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Default Class
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <GraduationCap className="h-4.5 w-4.5 text-slate-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="className"
-                    id="className"
-                    value={className}
-                    onChange={(e) => setClassName(e.target.value)}
-                    required
-                    placeholder="e.g. 8th"
-                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200/80 focus:border-slate-400 focus:bg-white rounded-[16px] text-slate-800 placeholder-slate-400 font-medium text-sm focus:outline-none transition duration-150"
-                  />
-                </div>
-              </div>
-            </div>
 
             {/* Actions Panel */}
             <div className="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">

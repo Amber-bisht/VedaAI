@@ -3,6 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface AssessmentData {
   _id: string;
   title: string;
+  subject?: string;
+  className?: string;
   dueDate: string;
   instructions?: string;
   criteria: {

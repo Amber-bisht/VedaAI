@@ -74,6 +74,8 @@ export const startAssessmentWorker = () => {
         const aiResponse = await generateAssessmentAI({
           dueDate: assessment.dueDate.toISOString(),
           instructions: assessment.instructions,
+          subject: assessment.subject,
+          className: assessment.className,
           questionTypes: assessment.criteria.questionTypes,
           contextText: contextText || undefined,
           imageBase64: imageBase64 || undefined,

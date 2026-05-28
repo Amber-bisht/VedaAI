@@ -21,6 +21,8 @@ export interface IAnswerKeyItem {
 
 export interface IAssessment extends Document {
   title: string;
+  subject: string;
+  className: string;
   dueDate: Date;
   instructions?: string;
   criteria: {
@@ -64,6 +66,8 @@ const AnswerKeyItemSchema = new Schema<IAnswerKeyItem>({
 const AssessmentSchema = new Schema<IAssessment>(
   {
     title: { type: String, required: true },
+    subject: { type: String, required: true },
+    className: { type: String, required: true },
     dueDate: { type: Date, required: true },
     instructions: { type: String },
     criteria: {

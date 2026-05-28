@@ -14,16 +14,14 @@ export const generateAssessmentPDF = async (assessment: IAssessment): Promise<st
   // Fetch dynamic settings from database
   let schoolName = 'Delhi Public School';
   let schoolAddress = 'Sector-4, Bokaro';
-  let subject = 'Science';
-  let className = '8th';
+  let subject = assessment.subject || 'Science';
+  let className = assessment.className || '8th';
 
   try {
     const dbSettings = await Settings.findOne();
     if (dbSettings) {
       schoolName = dbSettings.schoolName;
       schoolAddress = dbSettings.schoolAddress;
-      subject = dbSettings.subject;
-      className = dbSettings.className;
     }
   } catch (err) {
     console.error('Failed to load settings in pdfService, using defaults:', err);

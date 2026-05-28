@@ -8,6 +8,8 @@ export interface QuestionTypeConfig {
 
 interface FormState {
   title: string;
+  subject: string;
+  className: string;
   dueDate: string;
   instructions: string;
   questionTypes: QuestionTypeConfig[];
@@ -21,6 +23,8 @@ interface FormState {
 
 const initialState: FormState = {
   title: 'Quiz on Electricity',
+  subject: 'Science',
+  className: '8th',
   dueDate: '',
   instructions: '',
   questionTypes: [
@@ -39,6 +43,12 @@ const assessmentFormSlice = createSlice({
   reducers: {
     setTitle(state, action: PayloadAction<string>) {
       state.title = action.payload;
+    },
+    setSubject(state, action: PayloadAction<string>) {
+      state.subject = action.payload;
+    },
+    setClassName(state, action: PayloadAction<string>) {
+      state.className = action.payload;
     },
     setDueDate(state, action: PayloadAction<string>) {
       state.dueDate = action.payload;
@@ -87,6 +97,8 @@ const assessmentFormSlice = createSlice({
 
 export const {
   setTitle,
+  setSubject,
+  setClassName,
   setDueDate,
   setInstructions,
   updateQuestionType,

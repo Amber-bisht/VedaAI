@@ -32,10 +32,10 @@ const upload = multer({
  */
 router.post('/', upload.single('file'), async (req: Request, res: Response) => {
   try {
-    const { title, dueDate, instructions, criteria } = req.body;
+    const { title, dueDate, instructions, criteria, subject, className } = req.body;
 
-    if (!title || !dueDate || !criteria) {
-      return res.status(400).json({ error: 'Title, due date, and criteria are required fields.' });
+    if (!title || !dueDate || !criteria || !subject || !className) {
+      return res.status(400).json({ error: 'Title, subject, class, due date, and criteria are required fields.' });
     }
 
     const parsedCriteria = typeof criteria === 'string' ? JSON.parse(criteria) : criteria;
@@ -59,6 +59,8 @@ router.post('/', upload.single('file'), async (req: Request, res: Response) => {
     // Create MongoDB document
     const assessment = new Assessment({
       title,
+      subject,
+      className,
       dueDate: new Date(dueDate),
       instructions,
       criteria: {

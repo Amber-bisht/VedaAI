@@ -7,6 +7,8 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 export interface GenerationParams {
   dueDate: string;
   instructions?: string;
+  subject?: string;
+  className?: string;
   questionTypes: Array<{
     type: string;
     count: number;
@@ -64,7 +66,7 @@ Difficulty tags MUST be strictly either "Easy", "Moderate", or "Challenging".
 CRITICAL: Do not output raw newlines, carriage returns, or tab characters inside any JSON string values (like "text" or "answerText"). If you need to write multi-line text or equations, format them as single-line strings using escaped '\\n' sequences instead. Ensure all string quotes are properly closed.`;
 
   const userPrompt = `Generate an assessment paper based on the following criteria:
-
+${params.subject ? `Subject: ${params.subject}\n` : ''}${params.className ? `Grade/Class: ${params.className}\n` : ''}
 ${params.instructions ? `Teacher's Additional Instructions:\n${params.instructions}\n` : ''}
 Required Question Breakdown:
 ${questionRequirements}
