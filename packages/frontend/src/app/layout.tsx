@@ -46,6 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${outfit.variable} ${inter.variable} ${geistSans.variable} ${geistMono.variable} ${lora.variable} ${bricolageGrotesque.variable} h-full antialiased`}
     >
       <head>
@@ -55,7 +56,7 @@ export default function RootLayout({
           precedence="default"
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans">
         <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>

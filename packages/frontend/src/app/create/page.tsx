@@ -236,7 +236,8 @@ export default function CreateAssignment() {
       }
       setFormError(null);
 
-      // Proceed to Step 2
+      // Clear previous job state & proceed to Step 2
+      dispatch(clearJobState());
       dispatch(setStep(2));
 
       // Trigger API POST request
@@ -618,7 +619,7 @@ export default function CreateAssignment() {
           /* STEP 2: GENERATION SCREEN - Loading Queue Progress */
           <div className="space-y-6">
             <div className="bg-white/50 border border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px] text-center shadow-sm backdrop-blur-md">
-              {genStatus === 'pending' || genStatus === 'processing' ? (
+              {genStatus === 'idle' || genStatus === 'pending' || genStatus === 'processing' ? (
                 <>
                   <div className="relative mb-6">
                     <Loader2 className="w-16 h-16 text-slate-800 animate-spin" />
@@ -680,7 +681,7 @@ export default function CreateAssignment() {
                 </>
               )}
 
-              {(genStatus === 'pending' || genStatus === 'processing') && (
+              {(genStatus === 'idle' || genStatus === 'pending' || genStatus === 'processing') && (
                 <button
                   type="button"
                   onClick={handleCancelGeneration}

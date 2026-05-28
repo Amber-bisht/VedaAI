@@ -17,6 +17,21 @@ import {
   Award
 } from 'lucide-react';
 
+const renderFormattedText = (text: string) => {
+  if (!text) return '';
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="font-extrabold text-slate-900">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
 export default function AssessmentDetails() {
   const router = useRouter();
   const params = useParams();
@@ -265,12 +280,12 @@ export default function AssessmentDetails() {
 
                     {sectionSubtitle && (
                       <div className="text-left font-bold text-slate-800 text-sm font-sans mt-4">
-                        {sectionSubtitle}
+                        {renderFormattedText(sectionSubtitle)}
                       </div>
                     )}
                     {sec.instructions && (
                       <p className="text-left text-xs font-medium italic text-slate-500 font-sans mt-1">
-                        {sec.instructions}
+                        {renderFormattedText(sec.instructions)}
                       </p>
                     )}
 
@@ -280,7 +295,7 @@ export default function AssessmentDetails() {
                           <div className="font-sans text-slate-800 text-sm leading-relaxed">
                             <span className="font-bold mr-1.5">{qIdx + 1}.</span>
                             <span className="mr-1.5 font-medium">[{q.difficulty}]</span>
-                            <span className="mr-2">{q.text}</span>
+                            <span className="mr-2">{renderFormattedText(q.text)}</span>
                             <span className="font-bold whitespace-nowrap">
                               [{q.marks} Mark{q.marks > 1 ? 's' : ''}]
                             </span>
@@ -323,7 +338,7 @@ export default function AssessmentDetails() {
                     <div key={ansIdx} className="font-sans text-sm">
                       <p className="font-bold text-slate-800">{ans.questionIndex}:</p>
                       <p className="text-slate-600 pl-4 mt-1 leading-relaxed text-justify">
-                        {ans.answerText}
+                        {renderFormattedText(ans.answerText)}
                       </p>
                     </div>
                   ))}

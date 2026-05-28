@@ -6,6 +6,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const formatMarkdown = (text: string): string => {
+  if (!text) return '';
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+};
+
 /**
  * Renders the assessment document as HTML and uses Puppeteer to compile it into an A4 PDF.
  * Saves the PDF to S3 and returns the file URL.
@@ -52,7 +57,7 @@ export const generateAssessmentPDF = async (assessment: IAssessment): Promise<st
           <div class="mb-4 break-inside-avoid">
             <div class="flex justify-between items-start">
               <span class="text-base font-serif font-medium w-full text-justify">
-                ${index + 1}. <span class="font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mr-1">${difficultyBadge}</span> ${q.text}
+                ${index + 1}. <span class="font-sans text-xs uppercase tracking-wider text-slate-500 font-bold mr-1">${difficultyBadge}</span> ${formatMarkdown(q.text)}
               </span>
               <span class="text-sm font-serif font-semibold whitespace-nowrap ml-4">[${q.marks} Mark${q.marks > 1 ? 's' : ''}]</span>
             </div>
@@ -82,7 +87,7 @@ export const generateAssessmentPDF = async (assessment: IAssessment): Promise<st
           (ans) => `
         <div class="mb-4 break-inside-avoid">
           <p class="font-serif font-bold text-sm text-slate-800">${ans.questionIndex}:</p>
-          <p class="font-serif text-sm text-slate-700 pl-4 mt-1">${ans.answerText}</p>
+          <p class="font-serif text-sm text-slate-700 pl-4 mt-1">${formatMarkdown(ans.answerText)}</p>
         </div>
       `
         )
