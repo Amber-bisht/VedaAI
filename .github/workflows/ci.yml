@@ -5,22 +5,10 @@ on:
     branches:
       - main
       - master
-    paths:
-      - 'packages/backend/**'
-      - 'packages/shared/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/ci.yml'
   pull_request:
     branches:
       - main
       - master
-    paths:
-      - 'packages/backend/**'
-      - 'packages/shared/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/ci.yml'
 
 permissions:
   contents: read
@@ -110,7 +98,7 @@ jobs:
               backend:
                 image: ${{ env.IMAGE_NAME }}:latest
                 ports:
-                  - "5001:5001"
+                  - "5005:5001"
                 env_file:
                   - .env
                 environment:

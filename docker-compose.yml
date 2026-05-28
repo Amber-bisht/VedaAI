@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: packages/backend/Dockerfile
     ports:
-      - "5001:5001"
+      - "5005:5001"
     env_file:
       - .env
     environment:
